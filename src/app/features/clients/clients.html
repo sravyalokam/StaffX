@@ -1,0 +1,299 @@
+<div *ngIf="isLoading"
+  class="overlay-loader w-full h-full fixed top-0 left-0 flex items-center justify-center bg-white/50 z-50">
+  <mat-spinner></mat-spinner>
+</div>
+
+
+<!-- Clients Component -->
+
+<div class="p-6" *ngIf="showClientsComponent">
+  <div class="flex justify-between items-center mb-6">
+
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Clients</h1>
+    </div>
+
+    <app-my-utility 
+      label="Add Client" 
+      variant="#394253" 
+      [icon]="plusIcon" 
+      (clicked)="openAddClientForm()">
+    </app-my-utility>
+  </div>
+
+
+  <div class="bg-white rounded-lg shadow overflow-hidden ">
+    <div class="overflow-x-auto h-[65vh] relative">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="sticky top-0 z-20 bg-gray-50">
+          <tr class="text-left ">
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">CLIENT NAME</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">SALES MANAGERS</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">ACCOUNT MANAGERS</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">CONTACTS</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">REQUIREMENTS</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">ACTIONS</th>
+          </tr>
+        </thead>
+  
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let c of clientsData" class="hover:bg-gray-50 transition-colors">
+            <td class="px-3 py-2 whitespace-nowrap text-sm">{{ c.name }}</td>
+  
+            <td class="px-3 py-2 whitespace-nowrap text-sm">
+              <div *ngIf="c.sales_manager_client_accesses?.length; else dash1">
+                <span *ngFor="let a of c.sales_manager_client_accesses; let last = last">
+                  {{ a.employee_name }}<span *ngIf="!last">, </span>
+                </span>
+              </div>
+              <ng-template #dash1>-</ng-template>
+            </td>
+  
+  
+            <td class="px-3 py-2 whitespace-normal text-sm">
+              <div *ngIf="c.client_accesses?.length; else dash2">
+                <span *ngFor="let a of c.client_accesses; let last = last">
+                  {{ a.employee_name }}<span *ngIf="!last">, </span>
+                </span>
+              </div>
+              <ng-template #dash2>-</ng-template>
+            </td>
+  
+  
+  
+            <td class="px-3 py-2 whitespace-nowrap text-sm">
+              <div class="relative flex items-center space-x-2 group">
+                <div class="flex items-center space-x-2 cursor-pointer" *ngIf="c.contacts.length > 0; else noContactDash">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-user text-blue-600">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span class="text-blue-600 font-bold">{{ c.contacts.length }}</span>
+                </div>
+  
+                <ng-template #noContactDash>-</ng-template>
+  
+                <div class="absolute left-0 top-6 z-50 hidden hover:block
+                            bg-white text-gray-800 text-sm rounded-lg shadow-lg
+                            border border-gray-200 p-3 w-56">
+                  <div *ngIf="c.contacts.length > 0">
+                    <div *ngFor="let d of c.contacts" class="border-b border-gray-100 py-1 last:border-0">
+                      <p class="font-medium text-gray-900">{{ d.name }}</p>
+                      <p class="text-gray-600 text-xs">{{ d.email }}</p>
+                      <p class="text-gray-600 text-xs">{{ d.phone }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+  
+            <td class="px-3 py-2 whitespace-nowrap text-sm">
+  
+              <button class="flex items-center" (click)="toggleRequirementsComponent(c.id)"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-briefcase w-4 h-4 text-blue-600 mr-2">
+                  <rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+  
+  
+                <span class=" text-blue-600 text-[14px] font-bold mr-2 flex items-center justify-center">
+                  {{ c.jobs_count }}
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-arrow-up-right w-4 h-4 text-blue-600">
+                  <path d="M7 7h10v10"></path>
+                  <path d="M7 17 17 7"></path>
+                </svg>
+              </button>
+  
+            </td>
+  
+            <td class="px-3 py-2 whitespace-nowrap text-sm">
+              <app-my-utility label="Add Requirement" variant="#F3F4F6" (clicked)="addContact()" textColor="#111827"
+                [icon]="plusIcon">
+              </app-my-utility>
+            </td>
+          </tr>
+  
+        </tbody>
+      </table>
+    </div>
+
+     <app-pagination-utility [currentPage]="currentPage" [totalPages]="totalPages" [totalItems]="totalItems"
+      [pageSize]="pageSize" (onPageChange)="onPageChange($event)" (onPageSizeChange)="onPageSizeChange($event)"
+      (onJumpToPage)="onJumpToPage($event)">
+    </app-pagination-utility>
+
+  </div>
+  
+</div>
+
+
+<!-- Clients Form -->
+
+
+<div *ngIf="isAddNewClientFormOpen"
+  class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-50 shadow-lg overflow-y-auto transition-transform duration-300 pt-12">
+
+
+  <div class="flex items-center justify-between p-4 border-b border-gray-200">
+    <h2 class="text-lg font-semibold text-gray-900">Add New Client</h2>
+    <button (click)="closeAddClientForm()" class="text-2xl font-bold text-gray-600 hover:text-black">&times;</button>
+  </div>
+
+
+  <form [formGroup]="addNewClientForm" (ngSubmit)="onAddClientSubmit()" class="space-y-6 p-5 " autocomplete="off">
+
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Client Name <span class="text-red-500">*</span>
+      </label>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <input type="text" matInput formControlName="ClientName" class="text-sm px-3 py-2" />
+      </mat-form-field>
+    </div>
+
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Location <span class="text-red-500">*</span>
+      </label>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <input matInput type="text" formControlName="Location" class="text-sm px-3 py-2" />
+        <mat-error *ngIf="isAddNewClientFormSubmitted && addNewClientForm.get('Location')?.invalid">
+          Please enter the Location
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Account Managers</label>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <input matInput placeholder="Select Account Managers" [formControl]="accountManagerFilterControl"
+          class="text-sm px-3 py-2" />
+        <mat-select formControlName="AccountManagers" multiple [panelClass]="'custom-select-panel'">
+          <mat-option *ngFor="let e of filteredAccountEmployees" [value]="e">
+            {{ e.employee_name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Sales Managers</label>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <input matInput placeholder="Select Sales Managers" [formControl]="salesManagerFilterControl"
+          class="text-sm px-3 py-2" />
+        <mat-select formControlName="SalesManagers" multiple [panelClass]="'custom-select-panel'">
+          <mat-option *ngFor="let e of filteredSalesEmployees" [value]="e">
+            {{ e.employee_name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-medium text-lg text-gray-900">Contacts</h3>
+        <app-my-utility label="Add Client Contact"  (clicked)="addContact()" variant="#F3F4F6" textColor="#111827">
+        </app-my-utility>
+      </div>
+
+
+      <div formArrayName="Contacts">
+        <div *ngFor="let contact of contacts.controls; let i = index" [formGroupName]="i"
+          class="mb-6 p-4 rounded bg-gray-50">
+
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input matInput type="text" formControlName="name" class="text-sm px-3 py-2" />
+            </mat-form-field>
+          </div>
+
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input matInput type="text" formControlName="email" class="text-sm px-3 py-2" />
+            </mat-form-field>
+          </div>
+
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+            <mat-form-field appearance="outline" class="w-full">
+              <input matInput type="text" formControlName="phone" class="text-sm px-3 py-2" />
+            </mat-form-field>
+          </div>
+
+
+          <div class="flex justify-end space-x-2 mt-4">
+            <app-my-utility label="Cancel" variant="secondary" (clicked)="cancelContact(i)">
+            </app-my-utility>
+            <app-my-utility label="Save Contact" variant="primary" (clicked)="saveContactInfo(i)"
+              [disabled]="contacts.invalid">
+            </app-my-utility>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="savedContacts.length > 0; else noContactsTemplate" class="mt-6">
+        <h3 class="text-lg font-bold">Saved Contacts:</h3>
+
+        <div *ngFor="let c of savedContacts" class="mt-4 p-4 rounded border border-gray-300 flex justify-between">
+          <div>
+            <p class="font-bold">{{ c.name }}</p>
+            <p>{{ c.email }}</p>
+            <p>{{ c.phone }}</p>
+          </div>
+
+          <div class="flex space-x-2">
+            <button type="button" class="text-blue-600 hover:text-blue-800 transition">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="text-red-600 hover:text-red-800 transition">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noContactsTemplate>
+        <p class="text-sm text-gray-500">No contacts added yet.</p>
+      </ng-template>
+    </div>
+
+
+    <div class="text-right">
+      <app-my-utility type="submit" label="Add Client" variant="secondary"
+        [disabled]="addNewClientForm.invalid || (isAddNewClientFormSubmitted && addNewClientForm.invalid)"
+        [isLoading]="isSubmitting">
+      </app-my-utility>
+    </div>
+  </form>
+</div>
+
+
+
+<!-- Requirements Reuse -->
+
+<app-requirements  
+  *ngIf="showRequirementsComponent"
+  [clientId]="selectedClientId">
+</app-requirements>

@@ -1,0 +1,382 @@
+<div>
+  <div *ngIf="isLoading"
+    class="overlay-loader w-full h-full fixed top-0 left-0 flex items-center justify-center bg-white/50 z-50">
+    <mat-spinner></mat-spinner>
+</div>
+
+
+<!-- Candidates Component -->
+
+<div class="p-6">
+  <div>
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <p class="text-2xl font-bold text-gray-900">Candidates - {{ requirementTitle }}</p>
+        </div>
+
+        <div class="flex space-x-4 flex-row items-center" *ngIf="!vendorId">
+          <app-my-utility
+            label="Add Candidate"
+            variant="#394253"
+            [icon]="plusIcon"
+            (clicked)="openAddNewCandidateForm()"
+            type="button"
+          >
+          </app-my-utility>
+        </div>
+      </div>
+
+      <div class="p-6"></div>
+
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto h-[65vh] relative">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="sticky top-0 z-20 bg-gray-50">
+              <tr class="text-left">
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  CLIENT
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  REQUIREMENT
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  CANDIDATE NAME
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  EMAIL
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  TYPE
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  STATUS
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  ROUNDS
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  EXPERIENCE (YEARS)
+                </th>
+                <th
+                  class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative"
+                >
+                  ACTIONS
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="candidatesData.length > 0; else noCandidates">
+                <tr
+                  *ngFor="let r of candidatesData"
+                  class="border border-gray-200 text-left hover:bg-gray-50 transition-colors"
+                >
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">{{ r.client_name }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">{{ r.job_title }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm text-[#2563EB] font-medium">
+                    {{ r.name }}
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">{{ r.email }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">
+                    <span
+                      class="inline-flex px-2 py-1 text-sm font-semibold text-center rounded-[5px]"
+                      [ngClass]="{
+                        'bg-[#DBEAFE] text-[#1E40AF]': r.resource_type === 'Cognine',
+                        'bg-[#F3E8FF] text-[#6B21A8]': r.resource_type === 'Vendor',
+                        'bg-[#F3F4F6] text-[#1F2937]': r.resource_type === 'Consultant'
+                      }"
+                    >
+                      {{ r.resource_type }}
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">
+                    <span
+                      class="inline-flex px-2 py-1 text-sm font-semibold text-center rounded-[5px]"
+                      [ngClass]="getStatusClass(r.status)"
+                    >
+                      {{ r.status }}
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">{{ r.rounds_count }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">{{ r.total_experience }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-sm">
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-400 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 px-3 py-1.5 text-sm"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-trash w-4 h-4 text-red-700"
+                      >
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+
+              <ng-template #noCandidates>
+                <tr>
+                  <td colspan="9" class="text-center py-20">
+                    <div
+                      class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-filter w-8 h-8 text-gray-400"
+                      >
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                      </svg>
+                    </div>
+                    <p class="text-lg font-semibold text-gray-900">No results found</p>
+                    <p class="text-gray-500">
+                      No candidates found. Add your first candidate to get started.
+                    </p>
+                  </td>
+                </tr>
+              </ng-template>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <app-pagination-utility
+          [currentPage]="currentPage"
+          [totalPages]="totalPages"
+          [totalItems]="totalItems"
+          [pageSize]="pageSize"
+          (onPageChange)="onPageChange($event)"
+          (onPageSizeChange)="onPageSizeChange($event)"
+          (onJumpToPage)="onJumpToPage($event)"
+        >
+        </app-pagination-utility>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Candidates Form -->
+
+<div class="p-[1.5rem]">
+
+  <div
+    *ngIf="isAddNewCandidateFormOpen"
+    class="pt-[50px] fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-lg overflow-y-auto transition-transform duration-300"
+  >
+    <div class="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+      <p class="text-lg font-semibold textt-[#111827]">Add New Candidate</p>
+      <button
+        (click)="closeAddNewCandidateForm()"
+        class="text-4xl font-base text-gray-400 hover:text-black"
+      >
+        &times;
+      </button>
+    </div>
+
+    <form
+      [formGroup]="AddNewCandidateForm"
+      (ngSubmit)="onAddNewCandidateFormSubmit()"
+      class="p-4 space-y-6"
+    >
+      <div>
+        <label class="flex text-sm font-medium text-gray-700 mb-2">
+          <div class="rounded-md border border-gray-200 bg-gray-50 w-100 h-15 p-4 h-auto">
+            <div class="font-normal text-gray-600">
+              Client: <span class="font-bold text-black">{{ clientName }}</span>
+            </div>
+
+            <div class="font-normal text-gray-600">
+              Requirement: <span class="font-bold text-black">{{ requirementTitle }}</span>
+            </div>
+          </div>
+        </label>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Candidate Type <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input
+            type="text"
+            matInput
+            formControlName="candidateType"
+            [matAutocomplete]="candidateTypeAuto"
+          />
+
+          <mat-autocomplete #candidateTypeAuto="matAutocomplete">
+            <mat-option *ngFor="let option of filteredCandidatesType | async" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <div *ngIf="showEmployeeSelect">
+          <label class="block text-sm font-medium text-gray-700">
+            Select Employee <span class="text-red-500">*</span>
+          </label>
+
+          <mat-form-field appearance="outline" class="w-full">
+           
+            <mat-select formControlName="selectEmployee">
+              <mat-option *ngFor="let e of emp" [value]="e.employee_id">
+                {{ e.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="showFullNameField">
+          <label class="block text-sm font-medium text-gray-700">
+            Full Name <span class="text-red-500">*</span>
+          </label>
+
+          <mat-form-field appearance="outline" class="w-full">
+            
+            <input matInput formControlName="fullName" />
+          </mat-form-field>
+        </div>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Email <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="email" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Phone <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="phone" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Location </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="location" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <div *ngIf="showSelectVendor">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Select Vendor <span class="text-red-500">*</span>
+          </label>
+          <mat-form-field appearance="outline" class="w-full mb-4">
+           
+            <input
+              type="text"
+              matInput
+              formControlName="selectVendor"
+              [matAutocomplete]="selectVendorAuto"
+            />
+            <mat-autocomplete #selectVendorAuto="matAutocomplete">
+              <mat-option *ngFor="let v of filteredVendors | async" [value]="v.id">
+                {{ v.name }}
+              </mat-option>
+            </mat-autocomplete>
+        
+          </mat-form-field>
+        </div>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Experience (years) <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="number" matInput formControlName="experience" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Skills (comma-seperated)
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="skills" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Candidate Status <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input
+            type="text"
+            matInput
+            formControlName="candidateStatus"
+            class="text-sm px-3 py-2"
+            [matAutocomplete]="autoCandidateStatus"
+          />
+
+          <mat-autocomplete #autoCandidateStatus="matAutocomplete">
+            <mat-option [value]="'Not Submitted'">Not Submitted</mat-option>
+            <mat-option [value]="'Submitted'">Submitted</mat-option>
+            <mat-option [value]="'Interviews in Progress'">Interviews in Progress</mat-option>
+            <mat-option [value]="'Selected'">Selected</mat-option>
+            <mat-option [value]="'Not Selected'">Not Selected</mat-option>
+            <mat-option [value]="'On Hold'">On Hold</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Attachments (PDF/Word/Excel)
+        </label>
+
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          accept=".pdf, .doc, .docx, .xls, .xlsx"
+          class="block w-full text-sm px-3 py-2 border border-gray-300 rounded"
+        />
+
+        <div class="text-right flex justify-end">
+          <app-my-utility
+            type="submit"
+            label="Add Candidate"
+            variant="secondary"
+            [disabled]="
+              AddNewCandidateForm.invalid ||
+              (isAddNewCandidateFormSubmitted && AddNewCandidateForm.invalid)
+            "
+          >
+          </app-my-utility>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

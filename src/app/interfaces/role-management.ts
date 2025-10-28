@@ -1,7 +1,9 @@
+import { SafeHtml } from '@angular/platform-browser';
+
 export interface RoleAssignment {
     employees: Employees[];
     employees_with_practices: EmployeesWithPractices[];
-    items: Items[];
+    items: RoleAssignmentItems[];
     roles: Roles[];
 }
 
@@ -23,7 +25,7 @@ export interface Practices{
     practice_name: string;
 }
 
-export interface Items{
+export interface RoleAssignmentItems{
     created_at?: Date;
     updated_at?: Date;
     id: number;
@@ -44,11 +46,11 @@ export interface Roles{
     type? : string;
 }
 
-export interface EmpRoles{
+export interface EmployeeRoles{
     emp_id: number;
     name: string;
     email: string;
     roles: { role: string }[] 
-    // practices?: [];
-    // actions?: [];
+    practices: string[];
+    actions?: (string | SafeHtml)[];
 }

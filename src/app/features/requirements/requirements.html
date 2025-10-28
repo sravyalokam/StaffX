@@ -1,0 +1,614 @@
+<div>
+  <div *ngIf="isLoading"
+    class="overlay-loader w-full h-full fixed top-0 left-0 flex items-center justify-center bg-white/50 z-50">
+    <mat-spinner></mat-spinner>
+  </div>
+
+
+
+  <!-- Requirements Component -->
+
+  <div class="p-6" *ngIf="showRequirementsComponent; else showNavBar">
+
+
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Requirements</h1>
+      </div>
+
+      <div class="flex">
+        <div *ngIf="!clientId">
+          <input type="text" placeholder="Search by requirement title or role" class="w-[20vw] h-9 px-3 py-1 border border-gray-300 rounded text-sm text-gray-400
+          focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 mr-3" [(ngModel)]="searchTerm"
+          (input)="onSearchChange()">
+        </div>
+        
+
+        <app-my-utility label="Add Requirement" variant="#394253" [icon]="plusIcon"
+          (clicked)="openAddNewRequirementForm()" type="button">
+        </app-my-utility>
+      </div>
+
+    </div>
+
+    <div class="p-6"></div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto h-[65vh] relative">
+        <table class="min-w-full divide-y divide-gray-200 ">
+          <thead class="sticky top-0 z-20 bg-gray-50">
+            <tr class="text-left">
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                <span class="flex ">
+                  <span>
+                    CLIENT
+                  </span>
+                  <span class="flex items-center justify-center px-[4px] cursor-pointer" (click)="toggleClientDropdown($event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-filter w-4 h-4 ">
+                      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+
+                  </span>
+                </span>
+
+                <div *ngIf="showClientDropdown"
+                  class="absolute left-14 top-10 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul class="max-h-60 overflow-y-auto">
+                    <li class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      All
+                    </li>
+                    <li *ngFor="let client of clientList"
+                      class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer  rounded hover:bg-gray-200 transition-colors text-gray-400"
+                      (click)="onClientSelect(client, $event)">
+                      {{ client }}
+                    </li>
+
+                  </ul>
+                </div>
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                REQUIREMENT TITLE</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                LOCATION</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                CREATED ON</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">START
+                DATE</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">TOTAL
+                POSITIONS</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                POSITIONS FULLFILLED</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                <span class="flex ">
+                  <span class="flex items-center justify-center mr-2">
+                    PRIORITY
+                  </span>
+
+                  <span class=" cursor-pointer p-1 rounded hover:bg-gray-200 transition-colors text-gray-400" (click)="togglePriorityDropdown($event)">
+                    <svg (click)="togglePriorityDropdown($event)" xmlns="http://www.w3.org/2000/svg" width="24"
+                      height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-filter w-4 h-4">
+                      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+
+
+                  </span>
+                </span>
+
+                <div *ngIf="showPriorityDropdown"
+                  class="absolute left-20 top-10 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul class="max-h-60 overflow-y-auto">
+                    <li *ngFor="let priority of allPriorities"
+                      class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer  "
+                      (click)="selectPriority(priority!)">
+                      {{ priority }}
+                    </li>
+                  </ul>
+                </div>
+
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                <span class="flex ">
+                  <span class="flex items-center justify-center mr-2">
+                    STATUS
+                   
+                  </span>
+                  <span class=" cursor-pointer p-1 rounded hover:bg-gray-200 transition-colors text-gray-400" (click)="toggleStatusDropdown($event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-filter w-4 h-4">
+                      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+
+                  </span>
+                </span>
+                <div *ngIf="showStatusDropdown"
+                  class="absolute left-0 top-10 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <ul class="max-h-60 overflow-y-auto">
+                    <li *ngFor="let status of allStatuses"
+                      class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      (click)="selectStatus(status!)">
+                      {{ status }}
+                    </li>
+
+                  </ul>
+                </div>
+
+              </th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                CANDIDATES</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                ACTIONS</th>
+
+            </tr>
+          </thead >
+          <tbody class="bg-white divide-y divide-gray-200">
+            <ng-container *ngIf="filteredRequirements.length > 0; else noRequirements">
+              <tr *ngFor="let i of filteredRequirements" class="border border-gray-200 text-left hover:bg-gray-50 transition-colors">
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i.client_name }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i.title }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i.location }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i.created_date | date:'dd-MMM-yyyy ' }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i.start_date | date:'dd-MMM-yyyy' }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i. positions }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">{{ i. positions_fulfilled }}</td>
+              <td class="px-3 py-2 whitespace-nowrap text-sm">
+                <span class="inline-flex px-2 py-1 text-sm font-semibold text-center rounded-[5px]" [ngClass]="{
+                'bg-[#FEE2E2] text-[#991B1B]': i.priority === 'High',
+                'bg-[#FEF9C3] text-[#854D0E]': i.priority === 'Medium',
+                'bg-[#F3F4F6] text-[#1F2937]': i.priority === 'Low'
+              }">
+                  {{ i.priority }}
+                </span>
+              </td>
+
+
+              <td class="px-3 py-2 whitespace-nowrap text-sm">
+                <span class="inline-flex px-2 py-1 text-sm font-semibold text-center rounded-[5px]" [ngClass]="{
+                'bg-[#FEF9C3] text-[#854D0E]': i.status === 'Open',
+                'bg-[#DCFCE7] text-[#166534]': i.status === 'Fulfilled',
+                'bg-[#F3F4F6] text-[#1F2937]': i.status === 'On Hold',
+                'bg-gray-200 text-gray-800': i.status === 'Cancelled',
+                'bg-red-100 text-red-800': i.status === 'Closed'
+              }">
+                  {{ i.status }}
+                </span>
+              </td>
+
+
+              <td class="px-3 py-2 whitespace-nowrap text-sm">
+                <button class="flex  items-center" (click)="toggleCandidates(i.id)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-users w-4 h-4 mr-2 text-blue-600">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+
+                  <span class=" text-blue-600 text-[14px] font-bold mr-2 flex items-center justify-center">
+                    {{ i. resources_count }}
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-arrow-up-right w-4 h-4 text-blue-600">
+                    <path d="M7 7h10v10"></path>
+                    <path d="M7 17 17 7"></path>
+                  </svg>
+                </button>
+              </td>
+
+
+
+
+              <td class="px-3 py-2 whitespace-nowrap text-sm">
+                <span class=" flex items-center">
+                  <button type="button"
+                    class="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-400 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 px-3 py-1.5 text-sm "><svg
+                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-eye w-4 h-4">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg></button>
+
+                  <button type="button"
+                    class="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-400 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 px-3 py-1.5 text-sm "><svg
+                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-square-pen w-4 h-4">
+                      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"></path>
+                    </svg></button>
+
+                  <button type="button"
+                    class="inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-400 shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200 px-3 py-1.5 text-sm "><svg
+                      xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-trash w-4 h-4  text-red-700">
+                      <path d="M3 6h18"></path>
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg></button>
+                </span>
+
+              </td>
+
+
+            </tr>
+            </ng-container>
+            <ng-template #noRequirements>
+                                <tr>
+                                    <td colspan="11" class="text-center py-25">
+                                        <div
+                                            class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-filter w-8 h-8 text-gray-400">
+                                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3">
+                                                </polygon>
+                                            </svg>
+                                        </div>
+                                        <p class="text-lg font-semibold text-gray-900">No results found</p>
+                                        <p class="text-gray-500">No requirements found. Add your first requirement to get started.</p>
+                                    </td>
+                                </tr>
+                            </ng-template>
+            
+          </tbody>
+        </table>
+
+
+      </div>
+      <app-pagination-utility 
+      [currentPage]="currentPage" 
+      [totalPages]="totalPages" 
+      [totalItems]="totalItems"
+      [pageSize]="pageSize" 
+      (onPageChange)="onPageChange($event)" 
+      (onPageSizeChange)="onPageSizeChange($event)"
+      (onJumpToPage)="onJumpToPage($event)">
+      </app-pagination-utility>
+
+    </div>
+
+  </div>
+
+  <!-- Breadcrumbs -->
+
+  <ng-template #showNavBar>
+
+    <div class="pt-6 pl-6">
+      <div class="" *ngIf="showCandidatesComponent">
+
+        <nav class="flex" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-2">
+                <li class="flex items-center">
+                    <a (click)="showRequirements()"
+                        class="flex items-center text-[#1E40AF] hover:text-blue-800 transition-colors font-base text-[16px] cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-home w-4 h-4 mr-1">
+                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        Home
+                    </a>
+                </li>
+
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chevron-right w-4 h-4 text-gray-400 mx-2">
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                 
+                      <a class="text-blue-800 hover:text-blue-800 transition-colors text-[16px] cursor-pointer" (click)="showRequirements()">
+                      
+                           {{ selectedRequirementTitle }}
+                        
+                      </a>
+                    
+                </li>
+
+                <li class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-chevron-right w-4 h-4 text-gray-400 mx-2">
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                    <span class="text-gray-500 text-base">Candidates</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+    </div>
+    
+  </ng-template>
+
+
+  <!-- Requirements Form -->
+
+
+  <div *ngIf="isAddNewRequirementFormOpen"
+    class="pt-[50px] fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-lg overflow-y-auto transition-transform duration-300">
+    <div class="flex items-center justify-between p-4 border-b border-gray-200">
+      <p class="text-lg font-semibold text-[#111827]">Add New Requirement</p>
+      <button (click)="closeAddNewRequirementForm()" class="text-4xl font-base text-gray-400 hover:text-black">
+        &times;
+      </button>
+    </div>
+
+    <form [formGroup]="AddNewRequirementForm" (ngSubmit)="onAddRequirementFormSubmit()" class="p-4 space-y-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Select Client <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="selectClient" placeholder="Select Client"
+            [matAutocomplete]="auto" />
+
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClientName">
+            <mat-option *ngFor="let client of filteredClients" [value]="client">
+              {{ client.client_name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <div *ngIf="isAddNewRequirementFormSubmitted && AddNewRequirementForm.get('selectClient')?.invalid"
+          class="text-sm text-red-500 mt-1">
+          Client name is required
+        </div>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Requirement Title <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="requirementTitle" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Recruiters
+        </label>
+
+        <div>
+          <!-- <label class="block text-sm font-medium text-gray-700 mb-2">Recruiters</label> -->
+
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput placeholder="Select Recruiters" [formControl]="recruiterFilterControl"
+              class="text-sm px-3 py-2" />
+
+            <mat-select formControlName="recruiter" multiple [panelClass]="'custom-select-panel'">
+              <mat-option *ngFor="let r of filteredRecruiters" [value]="r">
+                {{ r.employee_name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Select Status <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="selectStatus" class="text-sm px-3 py-2"
+            [matAutocomplete]="selectStatusAuto" />
+
+          <mat-autocomplete #selectStatusAuto="matAutocomplete" autoActiveFirstOption>
+            <mat-option *ngFor="let status of filteredStatuses" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Select Priority <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput placeholder="Select Priority" formControlName="selectPriority"
+            [matAutocomplete]="priorityAuto" />
+
+          <mat-autocomplete #priorityAuto="matAutocomplete" [displayWith]="displayPriority">
+            <mat-option *ngFor="let option of filteredPriorities" [value]="option">
+              {{ option }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Start Date
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input matInput [matDatepicker]="picker" formControlName="startDate">
+
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Related Experience <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="relatedExperience" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Total Experience <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="totalExperience" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Positions <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="positions" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Location <span class="text-red-500">*</span>
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="location" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Skills (comma-seperated)
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="skills" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Description
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput formControlName="description" class="text-sm px-3 py-2" />
+        </mat-form-field>
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Select Related Practices
+        </label>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <input type="text" matInput placeholder="Select Practice" formControlName="relatedPractices"
+            [matAutocomplete]="practicesAuto" />
+
+          <mat-autocomplete #practicesAuto="matAutocomplete" [displayWith]="displayPracticeName">
+            <mat-option *ngFor="let practice of filteredPractices" [value]="practice">
+              {{ practice.practice_name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+
+
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Attachments (PDF/Word/Excel)
+        </label>
+        <input type="file" (change)="onFileSelected($event)" accept=".pdf, .doc, .docx, .xls, .xlsx"
+          class="block w-full text-sm px-3 py-2 border border-gray-300 rounded" />
+
+
+
+
+      </div>
+
+
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-medium text-lg text-gray-900">Contacts</h3>
+          <app-my-utility label="Add Client Contact" variant="#F3F4F6" textColor="#111827" (clicked)="addContact()"
+            type="button">
+          </app-my-utility>
+        </div>
+
+
+        <div formArrayName="contacts">
+          <div *ngFor="let contact of contacts.controls; let i = index" [formGroupName]="i"
+            class="mb-6 p-4 rounded bg-gray-50">
+
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput type="text" formControlName="name" class="text-sm px-3 py-2" />
+              </mat-form-field>
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput type="text" formControlName="email" class="text-sm px-3 py-2" />
+              </mat-form-field>
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <input matInput type="text" formControlName="phone" class="text-sm px-3 py-2" />
+              </mat-form-field>
+            </div>
+
+
+            <div class="flex justify-end space-x-2 mt-4">
+              <app-my-utility label="Cancel" variant="transparent" (clicked)="cancelContact(i)" type="button"
+                textColor="dark">
+              </app-my-utility>
+              <app-my-utility label="Save Contact" variant="secondary" (clicked)="saveContactInfo(i)"
+                [disabled]="contacts.invalid" type="button">
+              </app-my-utility>
+            </div>
+          </div>
+        </div>
+
+
+        <div *ngIf="savedContacts.length > 0; else noContactsTemplate" class="mt-6">
+          <h3 class="text-lg font-bold">Saved Contacts:</h3>
+
+          <div *ngFor="let c of savedContacts" class="mt-4 p-4 rounded border border-gray-300 flex justify-between">
+            <div>
+              <p class="font-bold">{{ c.name }}</p>
+              <p>{{ c.email }}</p>
+              <p>{{ c.phone }}</p>
+            </div>
+
+            <div class="flex space-x-2">
+              <button type="button" class="text-blue-600 hover:text-blue-800 transition">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" class="text-red-600 hover:text-red-800 transition">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noContactsTemplate>
+          <p class="text-sm text-gray-500">No contacts added yet.</p>
+        </ng-template>
+      </div>
+
+      <div class="text-right flex justify-end">
+        <app-my-utility type="submit" label="Add Requirement" variant="secondary"
+          [disabled]="AddNewRequirementForm.invalid || ( isAddNewRequirementFormSubmitted && AddNewRequirementForm.invalid)">
+        </app-my-utility>
+      </div>
+
+
+    </form>
+  </div>
+
+
+
+  <!-- Candidates Component Reuse-->
+
+  <app-candidates *ngIf="showCandidatesComponent" 
+  [requirementId]="selectedRequirementId"
+  [requirementTitle]="selectedRequirementTitle || ''"></app-candidates>

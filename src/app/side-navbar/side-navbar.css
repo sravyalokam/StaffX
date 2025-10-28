@@ -1,0 +1,7 @@
+.nav-link.active {
+  background-color: #ffffff;
+  color: #394253;
+  padding-left: 0.75rem; 
+  padding-right: 1.2rem;
+}
+

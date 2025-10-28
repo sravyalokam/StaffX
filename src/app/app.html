@@ -1,3 +1,39 @@
-<app-role-assignment></app-role-assignment>
+<header
+  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white border-b-[0.5vh] border-[#0b497c] shadow-sm h-[51px]">
 
-<app-clients></app-clients>
+  <div class="flex items-center space-x-2 ml-0 p-[0px 15px]">
+    <img src="/assets/images/cognine.png" alt="Cognine Logo" class="inline-block max-w-[20vh]"
+      style="padding-top: 0.3vh; padding-left: 1vh" />
+  </div>
+
+
+  <div class="font-base text-gray-800 tracking-wide text-[22.128px]">
+    StaffX
+  </div>
+
+  <div class="flex items-center space-x-3">
+
+    <button class="flex items-center justify-center h-9 w-9  rounded-full hover:bg-gray-300 transition-colors">
+      <img src="/assets/images/app_icon.png" alt="" class="w-[40.56px] h-[21.33px]" />
+    </button>
+
+    <span class="text-[#212529] font-base whitespace-nowrap text-[18.44px]">
+      {{ currentEmployee?.name }}
+    </span>
+
+
+    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+      <i class="fa-solid fa-right-from-bracket text-gray-700"></i>
+    </button>
+  </div>
+</header>
+
+<div class=" group  top-0 left-0 z-40  w-full">
+  <app-side-navbar></app-side-navbar>
+</div>
+
+
+<footer
+  class="fixed bottom-0 left-0 w-full border-t-2 border-[#0b497c] text-end text-[12.5392px] text-[#212529] bg-white z-50">
+  ©2025 Cognine Technologies. All rights reserved..
+</footer>
